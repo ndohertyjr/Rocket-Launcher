@@ -7,8 +7,13 @@ public class Movement : MonoBehaviour
 {
     [SerializeField] private float rocketThrust = 2000.0f;
     [SerializeField] private float rotationSpeed = 100.0f;
+    [SerializeField] private AudioClip engineSound;
+    [SerializeField] private ParticleSystem mainEngineParticle;
+    [SerializeField] private ParticleSystem leftEngineParticle;
+    [SerializeField] private ParticleSystem rightEngineParticle;
     private AudioSource rocketLaunchSound;
     private bool audioPlaying = false;
+    
     private Rigidbody rocketBody;
     private float xVal;
     private float yVal;
@@ -32,21 +37,24 @@ public class Movement : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.Space))
         {
-            rocketBody.AddRelativeForce(new Vector3(0f,rocketThrust * Time.deltaTime,0f));
-
-            if (!rocketLaunchSound.isPlaying)
-            {
-                rocketLaunchSound.Play();
-            }
-            
-            
+            StartThrusting();
         }
         else
         {
+            mainEngineParticle.Stop();
             rocketLaunchSound.Stop();
         }
-        
-        
+    }
+
+    private void StartThrusting()
+    {
+        rocketBody.AddRelativeForce(new Vector3(0f, rocketThrust * Time.deltaTime, 0f));
+
+        if (!rocketLaunchSound.isPlaying)
+        {
+            mainEngineParticle.Play();
+            rocketLaunchSound.PlayOneShot(engineSound);
+        }
     }
 
     private void ProcessRotation()
@@ -54,11 +62,20 @@ public class Movement : MonoBehaviour
         if (Input.GetKey(KeyCode.D))
         {
             ApplyRotation(-rotationSpeed);
+            leftEngineParticle.Play();
         }
 
         else if (Input.GetKey(KeyCode.A))
         {
             ApplyRotation(rotationSpeed);
+            rightEngineParticle.Play();
+            
+        }
+
+        else
+        {
+            leftEngineParticle.Stop();
+            rightEngineParticle.Stop();
         }
     }
 
